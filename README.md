@@ -105,3 +105,8 @@ MIT
 у бота остался старый вебхук. В коде бота теперь выполняется `delete_webhook(drop_pending_updates=True)`
 при старте, но при необходимости можно удалить вебхук вручную через BotFather или по запросу:
 `https://api.telegram.org/bot<YOUR_TOKEN>/deleteWebhook?drop_pending_updates=true`
+
+
+### Bot /health
+Бот поднимает лёгкий HTTP-сервер на `$PORT` с эндпойнтами `/health` и `/ready`.
+Railway-домен для бота теперь отвечает 200 OK, даже при long polling.

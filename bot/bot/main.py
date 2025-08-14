@@ -1,6 +1,7 @@
 import os
 import asyncio
 from aiogram import Bot, Dispatcher, Router, F
+from aiohttp import web
 from aiogram.types import Message
 from aiogram.filters import Command
 import aiohttp
@@ -45,6 +46,22 @@ async def link_cmd(msg: Message):
     except Exception as e:
         await msg.answer(f"Ошибка запроса: {e}")
 
+
+async def _run_health_server():
+    app = web.Application()
+    async def health(_):
+        return web.json_response({"status": "ok"})
+    app.add_routes([web.get('/health', health), web.get('/ready', health)])
+    port = int(os.getenv("PORT", "8080"))
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    print(f"[bot] health server on :{port}")
+    # keep alive forever
+    while True:
+        await asyncio.sleep(3600)
+
 async def main():
     if not BOT_TOKEN:
         print("TELEGRAM_BOT_TOKEN не задан"); return
@@ -56,7 +73,10 @@ async def main():
         await bot.delete_webhook(drop_pending_updates=True)
     except Exception as e:
         print(f"delete_webhook warning: {e}")
-    await dp.start_polling(bot)
+    await asyncio.gather(
+        dp.start_polling(bot),
+        _run_health_server(),
+    )
 
 if __name__ == "__main__":
     asyncio.run(main())
