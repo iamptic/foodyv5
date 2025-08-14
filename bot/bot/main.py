@@ -51,6 +51,11 @@ async def main():
     dp = Dispatcher()
     dp.include_router(router)
     bot = Bot(BOT_TOKEN)
+    # Ensure we use long polling: Telegram may have an old webhook set for this token
+    try:
+        await bot.delete_webhook(drop_pending_updates=True)
+    except Exception as e:
+        print(f"delete_webhook warning: {e}")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

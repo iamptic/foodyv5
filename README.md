@@ -97,3 +97,11 @@ MIT
 
 - **Backend** использует `EmailStr` из Pydantic → необходим пакет `email-validator`. Он уже добавлен в `backend/requirements.txt`.
 - **Web**: из-за кэша на Railway возможна ошибка `EBUSY` при `npm ci`. В репозитории добавлен `.npmrc`, а на сервере используйте Build: `npm i --omit=dev --no-audit --no-fund`.
+
+
+### Telegram bot: webhook conflict
+Если при запуске видите ошибку вида
+`can't use getUpdates method while webhook is active; use deleteWebhook to delete the webhook first` —
+у бота остался старый вебхук. В коде бота теперь выполняется `delete_webhook(drop_pending_updates=True)`
+при старте, но при необходимости можно удалить вебхук вручную через BotFather или по запросу:
+`https://api.telegram.org/bot<YOUR_TOKEN>/deleteWebhook?drop_pending_updates=true`
