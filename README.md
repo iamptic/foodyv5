@@ -89,3 +89,11 @@ foody-canvas-kit/
 
 ## Лицензия
 MIT
+
+
+---
+
+## Примечания по сборке
+
+- **Backend** использует `EmailStr` из Pydantic → необходим пакет `email-validator`. Он уже добавлен в `backend/requirements.txt`.
+- **Web**: из-за кэша на Railway возможна ошибка `EBUSY` при `npm ci`. В репозитории добавлен `.npmrc`, а на сервере используйте Build: `npm i --omit=dev --no-audit --no-fund`.
