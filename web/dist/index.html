@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Foody Canvas Kit</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 40px; }
+    .card { max-width: 680px; padding: 24px; border: 1px solid #e5e7eb; border-radius: 14px; }
+    label { display:block; margin: 12px 0 6px; }
+    input, button { padding: 10px 14px; border-radius: 10px; border: 1px solid #cbd5e1; }
+    button { cursor: pointer; }
+    .row { display: flex; gap: 8px; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 6px; }
+    .ok { color: #16a34a; }
+    .err { color: #dc2626; }
+  </style>
+</head>
+<body>
+  <h1>Foody Canvas Kit</h1>
+  <p>Этот экран — для smoke‑проверок Canvas‑уровня. Прокси <code>/api/v1</code> → backend должен работать.</p>
+  <div class="card">
+    <h3>1) Health</h3>
+    <div id="health"></div>
+    <button id="btnHealth">Проверить /health через web</button>
+  </div>
+  <br/>
+  <div class="card">
+    <h3>2) Регистрация мерчанта</h3>
+    <label>Телефон (или email):</label>
+    <div class="row">
+      <input id="phone" placeholder="+79990000000" />
+      <button id="btnReg">POST /api/v1/merchant/register_public</button>
+    </div>
+    <pre id="regOut"></pre>
+  </div>
+
+  <script>
+    const elHealth = document.getElementById('health');
+    const elBtnH = document.getElementById('btnHealth');
+    const elBtnR = document.getElementById('btnReg');
+    const elPhone = document.getElementById('phone');
+    const elOut = document.getElementById('regOut');
+
+    elBtnH.onclick = async () => {
+      elHealth.textContent = '...';
+      try {
+        const r = await fetch('/health');
+        const j = await r.json();
+        elHealth.innerHTML = '<span class="ok">OK</span> ' + JSON.stringify(j);
+      } catch (e) {
+        elHealth.innerHTML = '<span class="err">ERR</span> ' + e;
+      }
+    };
+
+    elBtnR.onclick = async () => {
+      elOut.textContent = '...';
+      const payload = {};
+      const v = elPhone.value.trim();
+      if (v.includes('@')) payload.email = v; else payload.phone = v;
+      try {
+        const r = await fetch('/api/v1/merchant/register_public', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const j = await r.json();
+        elOut.textContent = JSON.stringify(j, null, 2);
+      } catch (e) {
+        elOut.textContent = 'ERR ' + e;
+      }
+    };
+  </script>
+</body>
+</html>
